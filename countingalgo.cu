@@ -46,7 +46,7 @@ __device__ bool is_smaller_gpu(const ui* d_main_degrees, VertexID u, VertexID v)
 }
 
 
-__global__ void triangle_counting_kernel (const ui d_vertices_count, const ui d_edges_count, const ui* d_main_degrees, const ui* d_degrees, const ui* d_offsets, const VertexID* d_neighbors, ui* d_triangle_counts)
+__global__ void triangle_counting_kernel (const ui* d_vertices_count, const ui* d_edges_count, const ui* d_main_degrees, const ui* d_degrees, const ui* d_offsets, const VertexID* d_neighbors, ui* d_triangle_counts)
 {
     // GPU triangle counting implementation
     long long exact_count = 0;
@@ -54,7 +54,7 @@ __global__ void triangle_counting_kernel (const ui d_vertices_count, const ui d_
     VertexID v = (blockIdx.x * blockDim.x) + threadIdx.x;
 
 
-    if(v >= d_vertices_count){
+    if(v >= *(d_vertices_count)){
         return;
     }
 
