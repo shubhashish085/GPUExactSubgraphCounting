@@ -46,7 +46,7 @@ __device__ bool is_smaller_gpu(const ui* d_main_degrees, VertexID u, VertexID v)
 }
 
 
-__global__ void triangle_counting_kernel (const ui d_vertices_count, const ui d_edges_count, const ui* d_main_degrees, const ui* d_degrees, const ui* d_offsets, const VertexID* d_neighbors, const ui* d_triangle_counts)
+__global__ void triangle_counting_kernel (const ui d_vertices_count, const ui d_edges_count, const ui* d_main_degrees, const ui* d_degrees, const ui* d_offsets, const VertexID* d_neighbors, ui* d_triangle_counts)
 {
     // GPU triangle counting implementation
     long long exact_count = 0;
@@ -97,8 +97,8 @@ long long CountingAlgorithm::db_count_triangle_parallel(Graph* augmented_graph){
     cudaMalloc((void**)&d_triangle_counts, (augmented_graph->vertices_count * sizeof(ui)));
 
 
-    cudaMemcpy(d_vertices_count, augmented_graph->vertices_count, sizeof(ui), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_edges_count, augmented_graph->edges_count, sizeof(ui), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_vertices_count, &(augmented_graph->vertices_count), sizeof(ui), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_edges_count, &(augmented_graph->edges_count), sizeof(ui), cudaMemcpyHostToDevice);
     cudaMemcpy(d_degrees, augmented_graph->degrees, (augmented_graph->vertices_count * sizeof(ui)), cudaMemcpyHostToDevice);
     cudaMemcpy(d_main_degrees, augmented_graph->main_degrees, (augmented_graph->vertices_count * sizeof(ui)), cudaMemcpyHostToDevice);
     cudaMemcpy(d_offsets, augmented_graph->offsets, ((augmented_graph->vertices_count + 1) * sizeof(ui)), cudaMemcpyHostToDevice);
