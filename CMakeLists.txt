@@ -22,9 +22,16 @@ include_directories(
 )
 
 set(SUBGRAPH_COUNTING_FILES  
-
+    commandparser.h
+    commandparser.cpp
+    countingalgo.h
     countingalgo.cu
-    distributedcountingalgo.cu
+    graph.h
+    graph.cpp
+    matchingcommand.h
+    matchingcommand.cpp
+    studyperformance.cpp
+    types.h
 )
 
 add_executable(GPUExactSubgraphCounting.out    ${SUBGRAPH_COUNTING_FILES})
