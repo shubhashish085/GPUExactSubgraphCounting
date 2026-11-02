@@ -2,7 +2,7 @@
 #include <cuda_runtime.h>
 
 
-__device__ bool check_directed_edge_existence_gpu(const ui* d_offsets, const VertexID* d_neighbors, VertexID u, VertexID w){
+__device__ bool check_directed_edge_existence_gpu(const ui* d_offsets, const VertexID* d_neighbors, VertexID u, VertexID v){
 
     ui count = 0;
 
@@ -28,7 +28,7 @@ __device__ bool check_directed_edge_existence_gpu(const ui* d_offsets, const Ver
 }
 
 
-__device__ bool is_smaller_gpu(const ui* d_main_degrees, VertexID u, VertexID w){
+__device__ bool is_smaller_gpu(const ui* d_main_degrees, VertexID u, VertexID v){
 
     if(u == v){
         return false;
@@ -67,7 +67,7 @@ __global__ void triangle_counting_kernel (const ui d_vertices_count, const ui d_
         u = d_neighbors[i];
         for(ui j = start; j < end; j++){
             w = d_neighbors[j];
-            if(is_smaller_gpu(u, w) && check_directed_edge_existence_gpu(u, w)){
+            if(is_smaller_gpu(d_main_degrees, u, w) && check_directed_edge_existence_gpu(d_offsets, d_neighbors, u, w)){
                 exact_count++;
             }
         }
@@ -81,8 +81,8 @@ __global__ void triangle_counting_kernel (const ui d_vertices_count, const ui d_
 long long CountingAlgorithm::db_count_triangle_parallel(Graph* augmented_graph){
 
 
-    ui* d_degrees = nullptr, *d_main_degrees = nullptr, *d_offsets = nullptr, *d_neighbors = nullptr;
-    ui* d_exact_count = nullptr;
+    ui* d_degrees = nullptr, *d_main_degrees = nullptr, *d_offsets = nullptr, *d_neighbors = nullptr, *d_triangle_counts = nullptr;
+    ui* d_exact_count = nullptr, *d_vertices_count = nullptr, *d_edges_count = nullptr;
     ui* triangle_counts = new ui[augmented_graph->vertices_count];
 
     long long exact_count = 0;
@@ -106,7 +106,7 @@ long long CountingAlgorithm::db_count_triangle_parallel(Graph* augmented_graph){
 
 
     int threads_per_block = 256;
-    int num_blocks = (num_vertices + threads_per_block - 1) / threads_per_block;
+    int num_blocks = (augmented_graph->vertices_count + threads_per_block - 1) / threads_per_block;
     
     triangle_counting_kernel<<<num_blocks, threads_per_block>>>(
         d_vertices_count,
