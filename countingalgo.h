@@ -11,7 +11,7 @@ class CountingAlgorithm {
 public:
 
     static long long db_count_triangle_parallel(Graph* augmented_graph);
-
+    static long long db_count_square_parallel(Graph* augmented_graph);
 };
 
 

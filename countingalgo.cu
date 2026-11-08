@@ -2,6 +2,28 @@
 #include <cuda_runtime.h>
 
 
+__device__ __forceinline__ ui array_intersection_gpu (const VertexID* d_neighbors, const ui array_1_start, const ui array_1_end, const ui array_2_start, const ui array_2_end) {
+    ui i = array_1_start, j = array_2_start;
+    ui count = 0;
+
+    while (i < array_1_end && j < array_2_end) {
+        if (d_neighbors[i] == d_neighbors[j]) {
+            count++;
+            i++;
+            j++;
+        } 
+        else if (d_neighbors[i] < d_neighbors[j]) {
+            i++;
+        } 
+        else {
+            j++;
+        }
+    }
+
+    return count;
+}
+
+
 __device__ bool check_directed_edge_existence_gpu(const ui* d_offsets, const VertexID* d_neighbors, VertexID u, VertexID v){
 
     ui count = 0;
@@ -43,6 +65,109 @@ __device__ bool is_smaller_gpu(const ui* d_main_degrees, VertexID u, VertexID v)
     }
 
     return false;
+}
+
+
+__global__ void square_counting_kernel (const ui* d_vertices_count, const ui* d_edges_count, const ui* d_main_degrees, const ui* d_degrees, const ui* d_offsets, const VertexID* d_neighbors, ui* d_square_counts)
+{
+    // GPU triangle counting implementation
+    long long exact_count = 0;
+    ui count_1 = 0, count_2 = 0, count_3 = 0;
+    
+    VertexID v1 = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+    if(v1 >= *(d_vertices_count)){
+        return;
+    }
+
+    VertexID v2, v3, v4;
+    ui v1_start = d_offsets[v1], v2_start, v3_start;
+    ui v1_end = d_offsets[v1 + 1], v2_end, v3_end;
+
+    // 1243 - Square
+    
+
+    for (VertexID j = v1_start; j < v1_end; j++){
+
+        v2 = d_neighbors[j];
+        v2_start = d_offsets[v2];
+        v2_end = d_offsets[v2 + 1];
+
+        for (VertexID k = v1_start; k < v1_end; k++){
+            
+            count_1 = 0;
+            v3 = d_neighbors[k];
+
+            if(!is_smaller_gpu(d_main_degrees, v2, v3)){
+                continue;
+            }
+
+            v3_start = d_offsets[v3];
+            v3_end = d_offsets[v3 + 1];
+
+            count_1 = array_intersection_gpu (d_neighbors, v2_start, v2_end, v3_start, v3_end);
+            exact_count += count_1;
+        }
+    }
+
+    //std::cout << "Count 1 : " << exact_count << std::endl;
+    // 1234 - Square
+
+    for (VertexID j = v1_start; j < v1_end; j++)
+    {
+        v2 = d_neighbors[j];
+        v2_start = d_offsets[v2];
+        v2_end = d_offsets[v2 + 1];
+
+        for (VertexID k = v2_start; k < v2_end; k++)
+        {
+            count_2 = 0;
+            v3 = d_neighbors[k];
+            v3_start = d_offsets[v3];
+            v3_end = d_offsets[v3 + 1];
+            
+            count_2 = array_intersection_gpu (d_neighbors, v1_start, v1_end, v3_start, v3_end);
+            exact_count += count_2;
+        }
+    }
+
+    //std::cout << "Count 2 : " << exact_count << std::endl;
+    // 1324 - Square
+
+    std::map<std::pair<VertexID, VertexID>, ui> wedge_map;
+    std::pair<VertexID, VertexID> search_pair;
+
+    for (VertexID v1 = 0; v1 < graph->vertices_count; v1++)
+    {
+        nbrs_1 = graph->getVertexNeighbors(v1, nbrs_1_cnt);
+
+        for (ui j = 0; j < nbrs_1_cnt; j++)
+        {
+            for (ui k = j+1; k < nbrs_1_cnt; k++)
+            {
+                search_pair = std::make_pair(std::min(nbrs_1[j], nbrs_1[k]), std::max(nbrs_1[j], nbrs_1[k]));
+                auto search = wedge_map.find(search_pair);
+                if (search == wedge_map.end())
+                {
+                    wedge_map[search_pair] = 1;
+                }
+                else
+                {
+                    wedge_map[search_pair] = wedge_map[search_pair] + 1;
+                }
+            }
+        }
+    }
+
+    for (auto const &[key, value] : wedge_map){
+        count_3 += (value * (value - 1)) / 2;
+    }
+
+    //std::cout << "Count 3 : " << count_3 << std::endl;
+
+    exact_count += count_3;
+
+    d_square_counts[v] = exact_count;     
 }
 
 
