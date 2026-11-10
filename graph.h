@@ -44,11 +44,15 @@ public:
     }
 
 public:
+
+    void loadGraphFromFile(const std::string& file_path);
+
     void loadGraphFromFileForBothDirectionEdges(const std::string& file_path);
 
     bool is_smaller(VertexID u, VertexID v);
     
     void transformToAugmentedGraph(Graph* augmented_graph);
+    void transformToAugmentedGraphForBothDirectionalEdges(Graph* augmented_graph);
     
 
     const ui* getOffsets() const {

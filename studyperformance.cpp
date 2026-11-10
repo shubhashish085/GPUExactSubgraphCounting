@@ -17,14 +17,15 @@ int main(int argc, char** argv){
 
     clock_t read_begin_clock = clock();
     Graph* graph = new Graph();
-    //graph->loadGraphFromFile(input_data_graph_file);
-    graph->loadGraphFromFileForBothDirectionEdges(input_data_graph_file);
+    graph->loadGraphFromFile(input_data_graph_file);
+    //graph->loadGraphFromFileForBothDirectionEdges(input_data_graph_file);
     double input_read_time = (double(clock() - read_begin_clock)) / CLOCKS_PER_SEC;    
 
 
     clock_t transformation_begin_clock = clock();
     Graph* augmented_graph = new Graph();
     graph->transformToAugmentedGraph(augmented_graph);
+    //graph->transformToAugmentedGraphForBothDirectionalEdges(augmented_graph);
     double transformation_time = (double(clock() - transformation_begin_clock)) / CLOCKS_PER_SEC;
 
     
@@ -36,7 +37,7 @@ int main(int argc, char** argv){
    
 
     std::cout << "==============================================" << std::endl;
-    std::cout << "Triangle Counting " << std::endl;
+    std::cout << "Triangle Counting (GPU) " << std::endl;
     std::cout << "Node Ordering - Degree Based ID " << std::endl;
     std::cout << "Input Graph File : " << input_data_graph_file << std::endl;
     std::cout << "Exact Triangle Count : " << exact_count << std::endl;    
