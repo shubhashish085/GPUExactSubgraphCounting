@@ -164,7 +164,7 @@ bool Graph::is_smaller(VertexID u, VertexID v){
 void Graph::transformToAugmentedGraph(Graph* augmented_graph){
 
     augmented_graph->vertices_count = vertices_count;
-    augmented_graph->edges_count = edges_count;
+    augmented_graph->edges_count = edges_count / 2;
     augmented_graph->offsets = new ui[vertices_count + 1];
     augmented_graph->neighbors = new VertexID[edges_count];
 

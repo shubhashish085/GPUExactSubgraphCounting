@@ -73,6 +73,8 @@ __global__ void triangle_counting_kernel (const ui* d_vertices_count, const ui* 
         }
     }
 
+    printf("Vertex ID : %d - Triangle Count : %d\n", v, exact_count);
+
     d_triangle_counts[v] = exact_count;     
 }
 
@@ -82,7 +84,7 @@ long long CountingAlgorithm::db_count_triangle_parallel(Graph* augmented_graph){
 
 
     ui* d_degrees = nullptr, *d_main_degrees = nullptr, *d_offsets = nullptr, *d_neighbors = nullptr, *d_triangle_counts = nullptr;
-    ui* d_exact_count = nullptr, *d_vertices_count = nullptr, *d_edges_count = nullptr;
+    ui* d_vertices_count = nullptr, *d_edges_count = nullptr;
     ui* triangle_counts = new ui[augmented_graph->vertices_count];
 
     long long exact_count = 0;
@@ -102,7 +104,7 @@ long long CountingAlgorithm::db_count_triangle_parallel(Graph* augmented_graph){
     cudaMemcpy(d_degrees, augmented_graph->degrees, (augmented_graph->vertices_count * sizeof(ui)), cudaMemcpyHostToDevice);
     cudaMemcpy(d_main_degrees, augmented_graph->main_degrees, (augmented_graph->vertices_count * sizeof(ui)), cudaMemcpyHostToDevice);
     cudaMemcpy(d_offsets, augmented_graph->offsets, ((augmented_graph->vertices_count + 1) * sizeof(ui)), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_neighbors, augmented_graph->neighbors, ((augmented_graph->vertices_count + 1) * sizeof(ui)), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_neighbors, augmented_graph->neighbors, ((augmented_graph->edges_count) * sizeof(VertexID)), cudaMemcpyHostToDevice);
 
 
     int threads_per_block = 256;
