@@ -118,7 +118,7 @@ __global__ void triangle_counting_warp_kernel(const ui* d_vertices_count, const 
 
     const VertexID u = blockIdx.x * (blockDim.x / WARP_SIZE) + warp_id;
 
-    if (u >= num_vertices){
+    if (u >= *(d_vertices_count)){
         return;
     }
 
