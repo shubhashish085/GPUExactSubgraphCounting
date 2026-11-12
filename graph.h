@@ -85,6 +85,18 @@ public:
         return neighbors + offsets[id];
     }
 
+    void fillSrcVertexArray(VertexID* src_vtx_array){
+
+        ui edge_idx = 0;
+
+        for(ui i = 0; i < vertices_count; i++){
+            for(ui j = offsets[i]; j < offsets[i + 1]; j++){
+                src_vtx_array[edge_idx] = i;
+                edge_idx++;
+            }
+        }
+    }
+
     void getNeighborCount(const VertexID id, ui& count) const {
         count = offsets[id + 1] - offsets[id];
     }
