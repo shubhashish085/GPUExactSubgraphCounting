@@ -44,11 +44,15 @@ public:
     }
 
 public:
+
+    void loadGraphFromFile(const std::string& file_path);
+
     void loadGraphFromFileForBothDirectionEdges(const std::string& file_path);
 
     bool is_smaller(VertexID u, VertexID v);
     
     void transformToAugmentedGraph(Graph* augmented_graph);
+    void transformToAugmentedGraphForBothDirectionalEdges(Graph* augmented_graph);
     
 
     const ui* getOffsets() const {
@@ -79,6 +83,18 @@ public:
     ui * getVertexNeighbors(const VertexID id, ui& count) const {
         count = offsets[id + 1] - offsets[id];
         return neighbors + offsets[id];
+    }
+
+    void fillSrcVertexArray(VertexID* src_vtx_array){
+
+        ui edge_idx = 0;
+
+        for(ui i = 0; i < vertices_count; i++){
+            for(ui j = offsets[i]; j < offsets[i + 1]; j++){
+                src_vtx_array[edge_idx] = i;
+                edge_idx++;
+            }
+        }
     }
 
     void getNeighborCount(const VertexID id, ui& count) const {
