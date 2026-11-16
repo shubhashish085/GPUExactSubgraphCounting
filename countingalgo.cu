@@ -106,7 +106,7 @@ __global__ void triangle_counting_kernel (const ui* d_vertices_count, const ui* 
         }
     }
 
-    printf("Vertex ID : %d - Triangle Count : %d\n", v, exact_count);
+    //printf("Vertex ID : %d - Triangle Count : %d\n", v, exact_count);
 
     d_triangle_counts[v] = exact_count;     
 }
