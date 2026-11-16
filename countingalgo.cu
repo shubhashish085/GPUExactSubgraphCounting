@@ -204,7 +204,6 @@ long long CountingAlgorithm::db_count_triangle_parallel(Graph* augmented_graph){
     cudaMemcpy(d_neighbors, augmented_graph->neighbors, ((augmented_graph->edges_count) * sizeof(VertexID)), cudaMemcpyHostToDevice);
 
 
-    int threads_per_block = 256;
     int num_blocks = (augmented_graph->vertices_count + threads_per_block - 1) / threads_per_block;
     
     triangle_counting_kernel<<<num_blocks, threads_per_block>>>(
@@ -260,7 +259,7 @@ long long CountingAlgorithm::db_count_triangle_warp_parallel(Graph* augmented_gr
     cudaMemcpy(d_neighbors, augmented_graph->neighbors, ((augmented_graph->edges_count) * sizeof(VertexID)), cudaMemcpyHostToDevice);
 
 
-    int threads_per_block = 256;
+    //int threads_per_block = 256;
     int warps_per_block = threads_per_block / WARP_SIZE;
     int num_blocks = (augmented_graph->vertices_count + warps_per_block - 1) / warps_per_block;
     
@@ -316,7 +315,7 @@ long long CountingAlgorithm::db_count_triangle_ei_parallel(Graph* augmented_grap
     cudaMemcpy(d_neighbors, augmented_graph->neighbors, ((augmented_graph->edges_count) * sizeof(VertexID)), cudaMemcpyHostToDevice);
 
 
-    int threads_per_block = 256;
+    //int threads_per_block = 256;
     int num_blocks = (augmented_graph->edges_count + threads_per_block - 1) / threads_per_block;
     
     triangle_counting_ei_kernel<<<num_blocks, threads_per_block>>>(
