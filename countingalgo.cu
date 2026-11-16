@@ -3,6 +3,8 @@
 
 #define WARP_SIZE 32
 
+int threads_per_block = 128;
+
 
 __device__ ui array_intersection_gpu(const VertexID* d_neighbors, VertexID start_u, VertexID end_u, VertexID start_v, VertexID end_v){
 

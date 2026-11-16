@@ -6,7 +6,7 @@
 #include "graph.h"
 #include "types.h"
 
-extern int threads_per_block = 128;
+extern int threads_per_block;
 
 class CountingAlgorithm {
 
