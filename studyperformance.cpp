@@ -124,14 +124,14 @@ int main(int argc, char** argv){
         transformation_time = (double(clock() - transformation_begin_clock)) / CLOCKS_PER_SEC;
     }
 
+    threads_per_block = thread_cnt;
+
     std::cout << "==============================================" << std::endl;
     std::cout << "Input Graph File : " << input_data_graph_file << std::endl;
-    std::cout << "Thread Count : " << thread_cnt << std::endl;
+    std::cout << "Thread Count Per Block : " << threads_per_block << std::endl;
     std::cout << "Input File Reading Time : " << input_read_time << " seconds" << std::endl;
     std::cout << "Transformation Time : " << transformation_time << " seconds" << std::endl;
     std::cout << "==============================================" << std::endl;
-
-    threads_per_block = thread_cnt;
 
     clock_t counting_begin_clock = clock();
     exact_count = CountingAlgorithm::db_count_triangle_parallel(augmented_graph);  
