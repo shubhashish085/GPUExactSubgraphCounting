@@ -3,6 +3,8 @@
 
 #define WARP_SIZE 32
 
+int threads_per_block = 128;
+
 
 __device__ ui array_intersection_gpu(const VertexID* d_neighbors, VertexID start_u, VertexID end_u, VertexID start_v, VertexID end_v){
 
@@ -229,7 +231,7 @@ __global__ void triangle_counting_kernel (const ui* d_vertices_count, const ui* 
         }
     }
 
-    printf("Vertex ID : %d - Triangle Count : %d\n", v, exact_count);
+    //printf("Vertex ID : %d - Triangle Count : %d\n", v, exact_count);
 
     d_triangle_counts[v] = exact_count;     
 }
@@ -329,7 +331,6 @@ long long CountingAlgorithm::db_count_triangle_parallel(Graph* augmented_graph){
     cudaMemcpy(d_neighbors, augmented_graph->neighbors, ((augmented_graph->edges_count) * sizeof(VertexID)), cudaMemcpyHostToDevice);
 
 
-    int threads_per_block = 256;
     int num_blocks = (augmented_graph->vertices_count + threads_per_block - 1) / threads_per_block;
     
     triangle_counting_kernel<<<num_blocks, threads_per_block>>>(
@@ -385,7 +386,7 @@ long long CountingAlgorithm::db_count_triangle_warp_parallel(Graph* augmented_gr
     cudaMemcpy(d_neighbors, augmented_graph->neighbors, ((augmented_graph->edges_count) * sizeof(VertexID)), cudaMemcpyHostToDevice);
 
 
-    int threads_per_block = 256;
+    //int threads_per_block = 256;
     int warps_per_block = threads_per_block / WARP_SIZE;
     int num_blocks = (augmented_graph->vertices_count + warps_per_block - 1) / warps_per_block;
     
@@ -441,7 +442,7 @@ long long CountingAlgorithm::db_count_triangle_ei_parallel(Graph* augmented_grap
     cudaMemcpy(d_neighbors, augmented_graph->neighbors, ((augmented_graph->edges_count) * sizeof(VertexID)), cudaMemcpyHostToDevice);
 
 
-    int threads_per_block = 256;
+    //int threads_per_block = 256;
     int num_blocks = (augmented_graph->edges_count + threads_per_block - 1) / threads_per_block;
     
     triangle_counting_ei_kernel<<<num_blocks, threads_per_block>>>(
