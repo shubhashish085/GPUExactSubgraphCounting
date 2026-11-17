@@ -215,7 +215,7 @@ __global__ void square_counting_kernel (const ui* d_vertices_count, const ui* d_
             v4_start = d_main_offsets[v4];
             v4_end = d_main_offsets[v4 + 1];
 
-            count_3 = array_intersection_with_ref_vtx_gpu(d_main_degrees, d_main_neighbors, v3_start, v3_end, v4_start, v4_end, v1, v1_degree);
+            count_3 = array_intersection_with_ref_vtx_gpu(d_main_degrees, d_main_neighbors, v3_start, v3_end, v4_start, v4_end, v1, v3, v4);
             exact_count += count_3;
         }
     }
