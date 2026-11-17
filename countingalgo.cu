@@ -23,7 +23,7 @@ __device__ bool is_smaller_gpu(const ui* d_main_degrees, VertexID u, VertexID v)
     return false;
 }
 
-__device__ ui array_intersection_gpu(const VertexID* d_neighbors, VertexID start_u, VertexID end_u, VertexID start_v, VertexID end_v){
+__device__ __forceinline__ ui array_intersection_gpu(const VertexID* d_neighbors, VertexID start_u, VertexID end_u, VertexID start_v, VertexID end_v){
 
     ui count = 0;
     VertexID i = start_u, j = start_v;
@@ -85,7 +85,7 @@ __device__ ui array_intersection_with_ref_vtx_gpu(const ui* d_main_degrees, cons
 }
 
 
-__device__ __forceinline__ ui array_intersection_gpu (const VertexID* d_neighbors, const ui array_1_start, const ui array_1_end, const ui array_2_start, const ui array_2_end) {
+/*__device__ __forceinline__ ui array_intersection_gpu (const VertexID* d_neighbors, const ui array_1_start, const ui array_1_end, const ui array_2_start, const ui array_2_end) {
     ui i = array_1_start, j = array_2_start;
     ui count = 0;
 
@@ -104,7 +104,7 @@ __device__ __forceinline__ ui array_intersection_gpu (const VertexID* d_neighbor
     }
 
     return count;
-}
+}*/
 
 
 __device__ bool check_directed_edge_existence_gpu(const ui* d_offsets, const VertexID* d_neighbors, VertexID u, VertexID v){
@@ -215,12 +215,12 @@ __global__ void square_counting_kernel (const ui* d_vertices_count, const ui* d_
             v4_start = d_main_offsets[v4];
             v4_end = d_main_offsets[v4 + 1];
 
-            count_3 = array_intersection_with_ref_vtx_gpu(d_main_neighbors, v3_start, v3_end, v4_start, v4_end, v1, v1_degree);
+            count_3 = array_intersection_with_ref_vtx_gpu(d_main_degrees, d_main_neighbors, v3_start, v3_end, v4_start, v4_end, v1, v1_degree);
             exact_count += count_3;
         }
     }
 
-    d_square_counts[v] = exact_count;     
+    d_square_counts[v1] = exact_count;     
 }
 
 
