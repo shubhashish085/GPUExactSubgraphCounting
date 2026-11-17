@@ -227,26 +227,43 @@
 int main(int argc, char** argv){
 
     std::string input_data_graph_file = argv[1];
+    std::string is_both_direction = argv[2];
+    std::string thread_cnt_str = argv[3];
 
-    clock_t read_begin_clock = clock();
+    int thread_cnt = std::stoi(thread_cnt_str);
+    long long exact_count = 0;
+
     Graph* graph = new Graph();
-    graph->loadGraphFromFile(input_data_graph_file);
-    //graph->loadGraphFromFileForBothDirectionEdges(input_data_graph_file);
-    double input_read_time = (double(clock() - read_begin_clock)) / CLOCKS_PER_SEC;    
-
-
-    clock_t transformation_begin_clock = clock();
     Graph* augmented_graph = new Graph();
-    graph->transformToAugmentedGraph(augmented_graph);
-    //graph->transformToAugmentedGraphForBothDirectionalEdges(augmented_graph);
-    double transformation_time = (double(clock() - transformation_begin_clock)) / CLOCKS_PER_SEC;
+    double input_read_time, transformation_time, counting_time, total_time;
 
-    
+    if(is_both_direction == "1"){
+
+        clock_t read_begin_clock = clock();
+        graph->loadGraphFromFileForBothDirectionEdges(input_data_graph_file);
+        input_read_time = (double(clock() - read_begin_clock)) / CLOCKS_PER_SEC; 
+
+        clock_t transformation_begin_clock = clock();
+        graph->transformToAugmentedGraphForBothDirectionalEdges(augmented_graph);
+        transformation_time = (double(clock() - transformation_begin_clock)) / CLOCKS_PER_SEC;
+
+    } else{
+
+        clock_t read_begin_clock = clock();
+        graph->loadGraphFromFile(input_data_graph_file);
+        input_read_time = (double(clock() - read_begin_clock)) / CLOCKS_PER_SEC; 
+
+        clock_t transformation_begin_clock = clock();
+        graph->transformToAugmentedGraph(augmented_graph);
+        transformation_time = (double(clock() - transformation_begin_clock)) / CLOCKS_PER_SEC;
+    }
+
+    threads_per_block = thread_cnt;    
 
     clock_t counting_begin_clock = clock();
-    long long exact_count = CountingAlgorithm::db_count_square_parallel(graph, augmented_graph);  
-    double counting_time = (double(clock() - counting_begin_clock)) / CLOCKS_PER_SEC;
-    double total_time = input_read_time + transformation_time + counting_time;
+    exact_count = CountingAlgorithm::db_count_square_parallel(graph, augmented_graph);  
+    counting_time = (double(clock() - counting_begin_clock)) / CLOCKS_PER_SEC;
+    total_time = input_read_time + transformation_time + counting_time;
    
 
     std::cout << "==============================================" << std::endl;
