@@ -21,6 +21,7 @@ public:
 
     //Square
     static long long db_count_square_parallel(Graph* main_graph, Graph* augmented_graph);
+    static long long db_count_square_ei_parallel (Graph* graph);
 
 };
 
