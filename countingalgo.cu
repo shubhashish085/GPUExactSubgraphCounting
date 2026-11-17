@@ -23,6 +23,7 @@ __device__ bool is_smaller_gpu(const ui* d_main_degrees, VertexID u, VertexID v)
     return false;
 }
 
+
 __device__ __forceinline__ ui array_intersection_gpu(const VertexID* d_neighbors, VertexID start_u, VertexID end_u, VertexID start_v, VertexID end_v){
 
     ui count = 0;
@@ -52,7 +53,7 @@ __device__ __forceinline__ ui array_intersection_gpu(const VertexID* d_neighbors
 }
 
 
-__device__ ui array_intersection_with_ref_vtx_gpu(const ui* d_main_degrees, const VertexID* d_neighbors, VertexID start_u, VertexID end_u, VertexID start_v, VertexID end_v, VertexID ref_vtx, ui ref_vtx_degree){
+__device__ ui array_intersection_with_ref_vtx_gpu(const ui* d_main_degrees, const VertexID* d_main_neighbors, VertexID start_u, VertexID end_u, VertexID start_v, VertexID end_v, VertexID v1, VertexID v3, VertexID v4){
 
     ui count = 0;
     VertexID i = start_u, j = start_v;
@@ -61,12 +62,12 @@ __device__ ui array_intersection_with_ref_vtx_gpu(const ui* d_main_degrees, cons
 
     while (i < end_u && j < end_v) {
 
-        a = d_neighbors[i];
-        b = d_neighbors[j];
+        a = d_main_neighbors[i];
+        b = d_main_neighbors[j];
 
         if (a == b) {
 
-            if(is_smaller_gpu(d_main_degrees, ref_vtx, a)){
+            if(is_smaller_gpu(d_main_degrees, v1, a) && is_smaller_gpu(d_main_degrees, a, v3) && is_smaller_gpu(d_main_degrees, a, v4)){
                 count++;
             }
             
@@ -153,7 +154,6 @@ __global__ void square_counting_kernel (const ui* d_vertices_count, const ui* d_
 
 
     // 1243 - Square
-    
 
     for (VertexID j = v1_start; j < v1_end; j++){
 
@@ -504,16 +504,16 @@ long long CountingAlgorithm::db_count_square_parallel(Graph* main_graph, Graph* 
     cudaMalloc((void**)&d_vertices_count, sizeof(ui));
     cudaMalloc((void**)&d_edges_count, sizeof(ui));    
     cudaMalloc((void**)&d_main_degrees, (augmented_graph->vertices_count * sizeof(ui)));
-    cudaMalloc((void**)&d_main_offsets, (augmented_graph->vertices_count * sizeof(ui)));
+    cudaMalloc((void**)&d_main_offsets, ((augmented_graph->vertices_count + 1)  * sizeof(ui)));
     cudaMalloc((void**)&d_offsets, ((augmented_graph->vertices_count + 1) * sizeof(ui)));
     cudaMalloc((void**)&d_main_neighbors, ((augmented_graph->edges_count) * 2 * sizeof(VertexID)));
-    cudaMalloc((void**)&d_neighbors, (augmented_graph->edges_count * sizeof(VertexID)));
-    cudaMalloc((void**)&d_square_counts, (augmented_graph->vertices_count * sizeof(ui)));
+    cudaMalloc((void**)&d_neighbors, ((augmented_graph->edges_count) * sizeof(VertexID)));
+    cudaMalloc((void**)&d_square_counts, ((augmented_graph->vertices_count) * sizeof(ui)));
 
 
     cudaMemcpy(d_vertices_count, &(augmented_graph->vertices_count), sizeof(ui), cudaMemcpyHostToDevice);
     cudaMemcpy(d_edges_count, &(augmented_graph->edges_count), sizeof(ui), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_main_degrees, augmented_graph->main_degrees, (augmented_graph->vertices_count * sizeof(ui)), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_main_degrees, augmented_graph->main_degrees, ((augmented_graph->vertices_count) * sizeof(ui)), cudaMemcpyHostToDevice);
     cudaMemcpy(d_main_offsets, main_graph->offsets, ((augmented_graph->vertices_count + 1) * sizeof(ui)), cudaMemcpyHostToDevice);
     cudaMemcpy(d_offsets, augmented_graph->offsets, ((augmented_graph->vertices_count + 1) * sizeof(ui)), cudaMemcpyHostToDevice);
     cudaMemcpy(d_main_neighbors, main_graph->neighbors, ((augmented_graph->edges_count) * 2 * sizeof(VertexID)), cudaMemcpyHostToDevice);
