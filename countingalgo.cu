@@ -264,18 +264,18 @@ __global__ void square_counting_ei_kernel (const ui* d_vertices_count, const ui*
     end_u   = d_offsets[u + 1];
 
     start_v = d_offsets[v];
-    end_v = d_offsets[v + 1];
+    end_v   = d_offsets[v + 1];
 
     upper_index_u = upper_bound_device(d_neighbors, start_u, end_u, v);
     upper_index_v = upper_bound_device(d_neighbors, start_v, end_v, u);
 
-    printf("Upper Index u : %d, Upper Index v : %d , end u : %d , end v : %d \n", upper_index_u, upper_index_v, end_u, end_v);
+    //printf("Upper Index u : %d, Upper Index v : %d , end u : %d , end v : %d \n", upper_index_u, upper_index_v, end_u, end_v);
 
     VertexID v3, v4;
 
     for (ui i = upper_index_u; i < end_u; i++){
         v3 = d_neighbors[i];
-        for (ui j = upper_index_v; i < end_v; j++){
+        for (ui j = upper_index_v; j < end_v; j++){
             v4 = d_neighbors[j];
             if((v3 != v4) && check_directed_edge_existence_gpu(d_offsets, d_neighbors, v3, v4)){
                 count += 1;
@@ -283,7 +283,7 @@ __global__ void square_counting_ei_kernel (const ui* d_vertices_count, const ui*
         }
     }
 
-    printf("Count : %d\n", count);
+    //printf("Count : %d\n", count);
 
     d_square_counts[e_idx] = count;     
 }

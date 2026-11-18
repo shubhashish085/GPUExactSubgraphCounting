@@ -319,7 +319,6 @@ int main(int argc, char** argv){
 
     std::cout << "==============================================" << std::endl;
     std::cout << "Square Counting (GPU - Thread Per Vertex) " << std::endl;
-    std::cout << "Node Ordering - Degree Based ID " << std::endl;
     std::cout << "Input Graph File : " << input_data_graph_file << std::endl;
     std::cout << "Exact Square Count : " << exact_count << std::endl;    
     std::cout << "Input File Reading Time : " << input_read_time << " seconds" << std::endl;
