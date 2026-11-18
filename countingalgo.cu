@@ -669,7 +669,7 @@ long long CountingAlgorithm::db_count_square_ei_parallel(Graph* graph, VertexID*
     );
     
     cudaDeviceSynchronize();
-    cudaMemcpy(square_counts, d_square_counts, (graph->edges_count * sizeof(ui)), cudaMemcpyDeviceToHost);
+    cudaMemcpy(square_counts, d_square_counts, ((graph->edges_count) * 2) * sizeof(ui), cudaMemcpyDeviceToHost);
 
     ui end_loop_idx = (graph->edges_count) * 2;
 
