@@ -272,10 +272,10 @@ __global__ void square_counting_ei_kernel (const ui* d_vertices_count, const ui*
     VertexID v3, v4;
 
     for (ui i = upper_index_u; i < end_u; i++){
-        v3 = d_neighbors[v3];
+        v3 = d_neighbors[i];
         for (ui j = upper_index_v; i < end_v; j++){
-            v4 = d_neighbors[v4];
-            if(check_directed_edge_existence_gpu(d_offsets, d_neighbors, v3, v4)){
+            v4 = d_neighbors[j];
+            if(check_directed_edge_existence_gpu(d_offsets, d_neighbors, v3, v4) && (v3 != v4)){
                 count += 1;
             }
         }
