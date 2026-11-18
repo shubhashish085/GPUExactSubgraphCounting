@@ -132,7 +132,7 @@ __device__ bool check_directed_edge_existence_gpu(const ui* d_offsets, const Ver
     ui count = 0;
 
     int begin = d_offsets[u];
-    int end = d_offsets[u + 1];
+    int end = d_offsets[u + 1] - 1;
     
     while (begin <= end) {
     
@@ -288,7 +288,7 @@ __global__ void square_counting_ei_kernel (const ui* d_vertices_count, const ui*
     d_square_counts[e_idx] = count;     
 }
 
-
+// Thread Per Vertex
 __global__ void triangle_counting_kernel (const ui* d_vertices_count, const ui* d_edges_count, const ui* d_main_degrees, const ui* d_degrees, const ui* d_offsets, const VertexID* d_neighbors, ui* d_triangle_counts)
 {
     // GPU triangle counting implementation

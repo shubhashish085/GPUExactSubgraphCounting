@@ -11,7 +11,7 @@
 
 
 // Triangle Count - Degree Based ID - For GPU
-/*int main(int argc, char** argv){
+int main(int argc, char** argv){
 
     std::string input_data_graph_file = argv[1];
 
@@ -37,7 +37,7 @@
    
 
     std::cout << "==============================================" << std::endl;
-    std::cout << "Triangle Counting (GPU) " << std::endl;
+    std::cout << "Triangle Counting (GPU - Thread Per Vertex) " << std::endl;
     std::cout << "Node Ordering - Degree Based ID " << std::endl;
     std::cout << "Input Graph File : " << input_data_graph_file << std::endl;
     std::cout << "Exact Triangle Count : " << exact_count << std::endl;    
@@ -47,7 +47,7 @@
     std::cout << "Total Time : " <<  total_time <<  " seconds" << std::endl;
     std::cout << "==============================================" << std::endl;
     
-}*/
+}
 
 
 
@@ -281,7 +281,7 @@
 
 
 // Square Count - Thread Per Edge
-int main(int argc, char** argv){
+/*int main(int argc, char** argv){
 
     std::string input_data_graph_file = argv[1];
     std::string is_both_direction = argv[2];
@@ -318,7 +318,7 @@ int main(int argc, char** argv){
    
 
     std::cout << "==============================================" << std::endl;
-    std::cout << "Square Counting (GPU - Thread Per Vertex) " << std::endl;
+    std::cout << "Square Counting (GPU - Thread Per Edge) " << std::endl;
     std::cout << "Input Graph File : " << input_data_graph_file << std::endl;
     std::cout << "Exact Square Count : " << exact_count << std::endl;    
     std::cout << "Input File Reading Time : " << input_read_time << " seconds" << std::endl;
@@ -326,7 +326,7 @@ int main(int argc, char** argv){
     std::cout << "Total Time : " <<  total_time <<  " seconds" << std::endl;
     std::cout << "==============================================" << std::endl;
     
-}
+}*/
 
 
 
