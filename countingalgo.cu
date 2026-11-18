@@ -263,7 +263,7 @@ __global__ void square_counting_ei_kernel (const ui* d_vertices_count, const ui*
     ui count = 0;    
     VertexID e_idx = (blockIdx.x * blockDim.x) + threadIdx.x;
 
-    if(e_idx >= *(d_edges_count) || (d_src_vertices[e_idx] >= d_neighbors[e_idx])){
+    if(e_idx >= ((*(d_edges_count)) * 2) || (d_src_vertices[e_idx] >= d_neighbors[e_idx])){
         return;
     }
 
@@ -340,7 +340,7 @@ __global__ void triangle_counting_ei_kernel (const ui* d_vertices_count, const u
     // GPU triangle counting implementation (EdgeIterator)    
     VertexID e_idx = (blockIdx.x * blockDim.x) + threadIdx.x;
 
-    if(e_idx >= ((*(d_edges_count)) * 2)){
+    if(e_idx >= *(d_edges_count)){
         return;
     }
 
