@@ -306,10 +306,13 @@ int main(int argc, char** argv){
         input_read_time = (double(clock() - read_begin_clock)) / CLOCKS_PER_SEC; 
     }
 
+    VertexID* src_vtx_array = new VertexID[(graph->edges_count) * 2];
+    graph->fillSrcVertexArray(src_vtx_array);
+
     threads_per_block = thread_cnt;    
 
     clock_t counting_begin_clock = clock();
-    exact_count = CountingAlgorithm::db_count_square_ei_parallel(graph);  
+    exact_count = CountingAlgorithm::db_count_square_ei_parallel(graph, src_vtx_array);  
     counting_time = (double(clock() - counting_begin_clock)) / CLOCKS_PER_SEC;
     total_time = input_read_time + counting_time;
    

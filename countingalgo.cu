@@ -24,7 +24,7 @@ __device__ bool is_smaller_gpu(const ui* d_main_degrees, VertexID u, VertexID v)
 }
 
 
-__device__ __forceinline__ int upper_bound_device(const int* arr, const ui start_idx, const ui end_idx, VertexID target) {
+__device__ __forceinline__ int upper_bound_device(const VertexID* arr, const ui start_idx, const ui end_idx, VertexID target) {
     ui left = start_idx, mid;
     ui right = end_idx;
 
@@ -613,7 +613,7 @@ long long CountingAlgorithm::db_count_square_parallel(Graph* main_graph, Graph* 
 
 
 // Thread Per Edge - Square
-long long CountingAlgorithm::db_count_square_ei_parallel(Graph* graph){
+long long CountingAlgorithm::db_count_square_ei_parallel(Graph* graph, VertexID* edge_src_vertices){
 
     ui* d_offsets = nullptr, *d_src_vertices = nullptr, *d_neighbors = nullptr, *d_square_counts = nullptr;
     ui* d_vertices_count = nullptr, *d_edges_count = nullptr;
@@ -663,7 +663,7 @@ long long CountingAlgorithm::db_count_square_ei_parallel(Graph* graph){
     cudaFree(d_offsets);
     cudaFree(d_src_vertices);
     cudaFree(d_neighbors);
-    cudaFree(d_triangle_counts); 
+    cudaFree(d_square_counts); 
 
     return exact_count;
 }
