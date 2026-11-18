@@ -11,7 +11,7 @@
 
 
 // Triangle Count - Degree Based ID - For GPU
-int main(int argc, char** argv){
+/*int main(int argc, char** argv){
 
     std::string input_data_graph_file = argv[1];
 
@@ -47,7 +47,7 @@ int main(int argc, char** argv){
     std::cout << "Total Time : " <<  total_time <<  " seconds" << std::endl;
     std::cout << "==============================================" << std::endl;
     
-}
+}*/
 
 
 
@@ -281,7 +281,7 @@ int main(int argc, char** argv){
 
 
 // Square Count - Thread Per Edge
-/*int main(int argc, char** argv){
+int main(int argc, char** argv){
 
     std::string input_data_graph_file = argv[1];
     std::string is_both_direction = argv[2];
@@ -326,7 +326,7 @@ int main(int argc, char** argv){
     std::cout << "Total Time : " <<  total_time <<  " seconds" << std::endl;
     std::cout << "==============================================" << std::endl;
     
-}*/
+}
 
 
 
