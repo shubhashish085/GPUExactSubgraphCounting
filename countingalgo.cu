@@ -23,6 +23,19 @@ __device__ bool is_smaller_gpu(const ui* d_main_degrees, VertexID u, VertexID v)
     return false;
 }
 
+__device__ __forceinline__ int upper_bound_device_alt(const VertexID* arr, const ui start_idx, const ui end_idx, VertexID target) {
+    ui idx = start_idx;
+    
+    while(idx < end_idx){
+        if(arr[idx] > target){
+            break;
+        }
+        idx++;
+    }   
+
+    return idx;
+}
+
 
 __device__ __forceinline__ int upper_bound_device(const VertexID* arr, const ui start_idx, const ui end_idx, VertexID target) {
     ui left = start_idx, mid;
@@ -266,8 +279,8 @@ __global__ void square_counting_ei_kernel (const ui* d_vertices_count, const ui*
     start_v = d_offsets[v];
     end_v   = d_offsets[v + 1];
 
-    upper_index_u = upper_bound_device(d_neighbors, start_u, end_u, v);
-    upper_index_v = upper_bound_device(d_neighbors, start_v, end_v, u);
+    upper_index_u = upper_bound_device_alt(d_neighbors, start_u, end_u, v);
+    upper_index_v = upper_bound_device_alt(d_neighbors, start_v, end_v, u);
 
     //printf("Upper Index u : %d, Upper Index v : %d , end u : %d , end v : %d \n", upper_index_u, upper_index_v, end_u, end_v);
 
