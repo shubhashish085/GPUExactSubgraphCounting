@@ -275,11 +275,13 @@ __global__ void square_counting_ei_kernel (const ui* d_vertices_count, const ui*
         v3 = d_neighbors[i];
         for (ui j = upper_index_v; i < end_v; j++){
             v4 = d_neighbors[j];
-            if(check_directed_edge_existence_gpu(d_offsets, d_neighbors, v3, v4) && (v3 != v4)){
+            if((v3 != v4) && check_directed_edge_existence_gpu(d_offsets, d_neighbors, v3, v4)){
                 count += 1;
             }
         }
     }
+
+    printf("Count : %d\n", count);
 
     d_square_counts[e_idx] = count;     
 }
