@@ -279,8 +279,8 @@ __global__ void square_counting_ei_kernel (const ui* d_vertices_count, const ui*
     start_v = d_offsets[v];
     end_v   = d_offsets[v + 1];
 
-    upper_index_u = upper_bound_device_alt(d_neighbors, start_u, end_u, v);
-    upper_index_v = upper_bound_device_alt(d_neighbors, start_v, end_v, u);
+    upper_index_u = upper_bound_device(d_neighbors, start_u, end_u, v);
+    upper_index_v = upper_bound_device(d_neighbors, start_v, end_v, u);
 
     //printf("Upper Index u : %d, Upper Index v : %d , end u : %d , end v : %d \n", upper_index_u, upper_index_v, end_u, end_v);
 
