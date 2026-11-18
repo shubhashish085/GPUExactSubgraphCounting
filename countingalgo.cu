@@ -340,7 +340,7 @@ __global__ void triangle_counting_ei_kernel (const ui* d_vertices_count, const u
     // GPU triangle counting implementation (EdgeIterator)    
     VertexID e_idx = (blockIdx.x * blockDim.x) + threadIdx.x;
 
-    if(e_idx >= *(d_edges_count)){
+    if(e_idx >= ((*(d_edges_count)) * 2)){
         return;
     }
 
