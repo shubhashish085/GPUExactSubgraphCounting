@@ -269,6 +269,8 @@ __global__ void square_counting_ei_kernel (const ui* d_vertices_count, const ui*
     upper_index_u = upper_bound_device(d_neighbors, start_u, end_u, v);
     upper_index_v = upper_bound_device(d_neighbors, start_v, end_v, u);
 
+    printf("Upper Index u : %d, Upper Index v : %d , end u : %d , end v : %d \n", upper_index_u, upper_index_v, end_u, end_v);
+
     VertexID v3, v4;
 
     for (ui i = upper_index_u; i < end_u; i++){
