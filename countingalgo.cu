@@ -657,7 +657,7 @@ long long CountingAlgorithm::db_count_square_ei_parallel(Graph* graph, VertexID*
 
 
     //int threads_per_block = 256;
-    int num_blocks = (graph->edges_count + threads_per_block - 1) / threads_per_block;
+    int num_blocks = (((graph->edges_count) * 2) + threads_per_block - 1) / threads_per_block;
     
     square_counting_ei_kernel<<<num_blocks, threads_per_block>>>(
         d_vertices_count,
