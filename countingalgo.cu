@@ -636,6 +636,8 @@ long long CountingAlgorithm::db_count_square_ei_parallel(Graph* graph){
     cudaMemcpy(d_src_vertices, edge_src_vertices, ((graph->edges_count) * 2 * sizeof(VertexID)), cudaMemcpyHostToDevice);
     cudaMemcpy(d_neighbors, graph->neighbors, ((graph->edges_count) * 2 * sizeof(VertexID)), cudaMemcpyHostToDevice);
 
+    cudaMemset(d_square_counts, 0, ((graph->edges_count) * 2 * sizeof(ui)));
+
 
     //int threads_per_block = 256;
     int num_blocks = (graph->edges_count + threads_per_block - 1) / threads_per_block;
