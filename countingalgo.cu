@@ -26,7 +26,7 @@ __device__ bool is_smaller_gpu(const ui* d_main_degrees, VertexID u, VertexID v)
 
 __device__ __forceinline__ int upper_bound_device(const VertexID* arr, const ui start_idx, const ui end_idx, VertexID target) {
     ui left = start_idx, mid;
-    ui right = end_idx;
+    ui right = end_idx - 1;
 
     while (left < right) {
 
