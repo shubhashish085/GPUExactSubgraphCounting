@@ -562,9 +562,9 @@ long long CountingAlgorithm::db_count_triangle_parallel_atomic(Graph* augmented_
 
 
     ui* d_degrees = nullptr, *d_main_degrees = nullptr, *d_offsets = nullptr, *d_neighbors = nullptr;
-    long long* d_triangle_count = nullptr;
+    unsigned long long* d_triangle_count = nullptr;
     ui* d_vertices_count = nullptr, *d_edges_count = nullptr;
-    long long triangle_count = 0;
+    unsigned long long triangle_count = 0;
     
 
     cudaMalloc((void**)&d_vertices_count, sizeof(ui));
@@ -669,9 +669,9 @@ long long CountingAlgorithm::db_count_triangle_warp_parallel(Graph* augmented_gr
 long long CountingAlgorithm::db_count_triangle_warp_parallel_atomic(Graph* augmented_graph){
 
     ui* d_degrees = nullptr, *d_main_degrees = nullptr, *d_offsets = nullptr, *d_neighbors = nullptr;
-    long long* d_triangle_count = nullptr;
+    unsigned long long* d_triangle_count = nullptr;
     ui* d_vertices_count = nullptr, *d_edges_count = nullptr;
-    long long triangle_count = 0;
+    unsigned long long triangle_count = 0;
 
     cudaMalloc((void**)&d_vertices_count, sizeof(ui));
     cudaMalloc((void**)&d_edges_count, sizeof(ui));    
@@ -773,9 +773,9 @@ long long CountingAlgorithm::db_count_triangle_ei_parallel(Graph* augmented_grap
 long long CountingAlgorithm::db_count_triangle_ei_parallel_atomic(Graph* augmented_graph, VertexID* edge_src_vertices){
 
     ui* d_offsets = nullptr, *d_src_vertices = nullptr, *d_neighbors = nullptr;
-    long long* d_triangle_count = nullptr;
+    unsigned long long* d_triangle_count = nullptr;
     ui* d_vertices_count = nullptr, *d_edges_count = nullptr;
-    long long triangle_count = 0;
+    unsigned long long triangle_count = 0;
    
 
     cudaMalloc((void**)&d_vertices_count, sizeof(ui));
