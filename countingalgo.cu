@@ -558,7 +558,7 @@ long long CountingAlgorithm::db_count_triangle_parallel(Graph* augmented_graph){
 
 
 // Thread Per Vertex - Triangle (Atomic)
-long long CountingAlgorithm::db_count_triangle_parallel_atomic(Graph* augmented_graph){
+unsigned long long CountingAlgorithm::db_count_triangle_parallel_atomic(Graph* augmented_graph){
 
 
     ui* d_degrees = nullptr, *d_main_degrees = nullptr, *d_offsets = nullptr, *d_neighbors = nullptr;
@@ -666,7 +666,7 @@ long long CountingAlgorithm::db_count_triangle_warp_parallel(Graph* augmented_gr
 }
 
 //Warp Per Vertex - Atomic
-long long CountingAlgorithm::db_count_triangle_warp_parallel_atomic(Graph* augmented_graph){
+unsigned long long CountingAlgorithm::db_count_triangle_warp_parallel_atomic(Graph* augmented_graph){
 
     ui* d_degrees = nullptr, *d_main_degrees = nullptr, *d_offsets = nullptr, *d_neighbors = nullptr;
     unsigned long long* d_triangle_count = nullptr;
@@ -770,7 +770,7 @@ long long CountingAlgorithm::db_count_triangle_ei_parallel(Graph* augmented_grap
 }
 
 // Thread Per Edge - Atomic
-long long CountingAlgorithm::db_count_triangle_ei_parallel_atomic(Graph* augmented_graph, VertexID* edge_src_vertices){
+unsigned long long CountingAlgorithm::db_count_triangle_ei_parallel_atomic(Graph* augmented_graph, VertexID* edge_src_vertices){
 
     ui* d_offsets = nullptr, *d_src_vertices = nullptr, *d_neighbors = nullptr;
     unsigned long long* d_triangle_count = nullptr;
