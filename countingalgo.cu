@@ -339,7 +339,7 @@ __global__ void triangle_counting_kernel (const ui* d_vertices_count, const ui* 
 __global__ void triangle_counting_kernel_atomic (const ui* d_vertices_count, const ui* d_edges_count, const ui* d_main_degrees, const ui* d_degrees, const ui* d_offsets, const VertexID* d_neighbors, long long* d_triangle_count)
 {
     // GPU triangle counting implementation
-    int exact_count = 0;
+    long long exact_count = 0;
     
     VertexID v = (blockIdx.x * blockDim.x) + threadIdx.x;
 
@@ -414,7 +414,7 @@ __global__ void triangle_counting_ei_kernel_atomic (const ui* d_vertices_count, 
     start_v = d_offsets[v];
     end_v = d_offsets[v + 1];
 
-    int intersection_length = (int)array_intersection_gpu(d_neighbors, start_u, end_u, start_v, end_v);
+    long long intersection_length = (long long)array_intersection_gpu(d_neighbors, start_u, end_u, start_v, end_v);
 
     atomicAdd(d_triangle_count, intersection_length);     
 }
@@ -475,7 +475,7 @@ __global__ void triangle_counting_warp_kernel_atomic(const ui* d_vertices_count,
     VertexID start_u = d_offsets[u];
     VertexID end_u   = d_offsets[u + 1];
 
-    int local_count = 0;
+    long long local_count = 0;
     VertexID start_v, end_v;
     int intersection_length;
 
@@ -485,7 +485,7 @@ __global__ void triangle_counting_warp_kernel_atomic(const ui* d_vertices_count,
         start_v = d_offsets[v];
         end_v   = d_offsets[v + 1];
 
-        intersection_length = (int)array_intersection_gpu(d_neighbors, start_u, end_u, start_v, end_v);
+        intersection_length = array_intersection_gpu(d_neighbors, start_u, end_u, start_v, end_v);
         local_count += intersection_length;
     }
 
