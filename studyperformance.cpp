@@ -187,7 +187,7 @@ int main(int argc, char** argv){
     std::string thread_cnt_str = argv[3];
 
     int thread_cnt = std::stoi(thread_cnt_str);
-    long long exact_count = 0;
+    unsigned long long exact_count = 0;
 
     Graph* graph = new Graph();
     Graph* augmented_graph = new Graph();
