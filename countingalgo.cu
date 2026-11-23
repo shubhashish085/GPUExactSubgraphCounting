@@ -475,7 +475,7 @@ __global__ void triangle_counting_warp_kernel_atomic(const ui* d_vertices_count,
     VertexID start_u = d_offsets[u];
     VertexID end_u   = d_offsets[u + 1];
 
-    unsigned long long local_count = 0;
+    int local_count = 0;
     VertexID start_v, end_v;
     int intersection_length;
 
