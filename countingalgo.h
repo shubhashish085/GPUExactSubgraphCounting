@@ -18,6 +18,11 @@ public:
     static long long db_count_triangle_warp_parallel(Graph* augmented_graph);
     static long long db_count_triangle_parallel_parameterized(Graph* augmented_graph, int thread_cnt);
 
+    //Triangle - Atomic
+    static long long db_count_triangle_parallel_atomic(Graph* augmented_graph);
+    static long long db_count_triangle_ei_parallel_atomic(Graph* augmented_graph, VertexID* edge_src_vertices);
+    static long long db_count_triangle_warp_parallel_atomic(Graph* augmented_graph);
+
 
     //Square
     static long long db_count_square_parallel(Graph* main_graph, Graph* augmented_graph);
