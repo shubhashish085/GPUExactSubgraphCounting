@@ -28,6 +28,10 @@ public:
     static long long db_count_square_parallel(Graph* main_graph, Graph* augmented_graph);
     static long long db_count_square_ei_parallel (Graph* graph, VertexID* edge_src_vertices);
 
+    //Square - Atomic
+    static long long db_count_square_parallel_atomic (Graph* main_graph, Graph* augmented_graph);
+    static long long db_count_square_ei_parallel_atomic (Graph* graph, VertexID* edge_src_vertices);
+
 };
 
 

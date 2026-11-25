@@ -256,6 +256,96 @@ __global__ void square_counting_kernel (const ui* d_vertices_count, const ui* d_
 }
 
 
+__global__ void square_counting_kernel_atomic (const ui* d_vertices_count, const ui* d_edges_count, const ui* d_main_degrees, const ui* d_main_offsets, const ui* d_main_neighbors, const ui* d_offsets, const VertexID* d_neighbors, unsigned long long* d_square_count)
+{
+    // GPU triangle counting implementation
+    unsigned long long exact_count = 0;
+    ui count_1 = 0, count_2 = 0, count_3 = 0;
+    
+    VertexID v1 = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+    if(v1 >= *(d_vertices_count)){
+        return;
+    }
+
+    VertexID v2, v3, v4;
+    ui v1_start = d_offsets[v1], v2_start, v3_start, v4_start;
+    ui v1_end = d_offsets[v1 + 1], v2_end, v3_end, v4_end;
+
+
+
+    // 1243 - Square
+
+    for (VertexID j = v1_start; j < v1_end; j++){
+
+        v2 = d_neighbors[j];
+        v2_start = d_offsets[v2];
+        v2_end = d_offsets[v2 + 1];
+
+        for (VertexID k = v1_start; k < v1_end; k++){
+            
+            count_1 = 0;
+            v3 = d_neighbors[k];
+
+            if(!is_smaller_gpu(d_main_degrees, v2, v3)){
+                continue;
+            }
+
+            v3_start = d_offsets[v3];
+            v3_end = d_offsets[v3 + 1];
+
+            count_1 = array_intersection_gpu (d_neighbors, v2_start, v2_end, v3_start, v3_end);
+            exact_count += count_1;
+        }
+    }
+
+    //std::cout << "Count 1 : " << exact_count << std::endl;
+    // 1234 - Square
+
+    for (VertexID j = v1_start; j < v1_end; j++)
+    {
+        v2 = d_neighbors[j];
+        v2_start = d_offsets[v2];
+        v2_end = d_offsets[v2 + 1];
+
+        for (VertexID k = v2_start; k < v2_end; k++)
+        {
+            count_2 = 0;
+            v3 = d_neighbors[k];
+            v3_start = d_offsets[v3];
+            v3_end = d_offsets[v3 + 1];
+            
+            count_2 = array_intersection_gpu (d_neighbors, v1_start, v1_end, v3_start, v3_end);
+            exact_count += count_2;
+        }
+    }
+
+    //std::cout << "Count 2 : " << exact_count << std::endl;
+    // 1324 - Square
+
+    ui v1_degree = d_main_degrees[v1];
+
+    for (ui j = v1_start; j < v1_end; j++){
+        
+        v3 = d_neighbors[j];
+        v3_start = d_main_offsets[v3];
+        v3_end = d_main_offsets[v3 + 1];
+
+        for (ui k = j+1; k < v1_end; k++){
+            v4 = d_neighbors[k];
+            v4_start = d_main_offsets[v4];
+            v4_end = d_main_offsets[v4 + 1];
+
+            count_3 = array_intersection_with_ref_vtx_gpu(d_main_degrees, d_main_neighbors, v3_start, v3_end, v4_start, v4_end, v1, v3, v4);
+            exact_count += count_3;
+        }
+    }
+
+    atomicAdd(d_square_count, exact_count); 
+}
+
+
+
 __global__ void square_counting_ei_kernel (const ui* d_vertices_count, const ui* d_edges_count, const ui* d_offsets, const VertexID* d_src_vertices, const VertexID* d_neighbors, ui* d_square_counts)
 {
 
@@ -300,6 +390,53 @@ __global__ void square_counting_ei_kernel (const ui* d_vertices_count, const ui*
 
     d_square_counts[e_idx] = count;     
 }
+
+
+__global__ void square_counting_ei_kernel_atomic (const ui* d_vertices_count, const ui* d_edges_count, const ui* d_offsets, const VertexID* d_src_vertices, const VertexID* d_neighbors, unsigned long long* d_square_count)
+{
+
+    // GPU triangle counting implementation (EdgeIterator)
+    unsigned long long count = 0;    
+    VertexID e_idx = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+    if(e_idx >= ((*(d_edges_count)) * 2) || (d_src_vertices[e_idx] >= d_neighbors[e_idx])){
+        return;
+    }
+
+    VertexID u, v, start_u, start_v, end_u, end_v;
+    ui upper_index_u, upper_index_v;
+
+    u = d_src_vertices[e_idx];
+    v = d_neighbors[e_idx];
+
+    start_u = d_offsets[u];
+    end_u   = d_offsets[u + 1];
+
+    start_v = d_offsets[v];
+    end_v   = d_offsets[v + 1];
+
+    upper_index_u = upper_bound_device_alt(d_neighbors, start_u, end_u, v);
+    upper_index_v = upper_bound_device_alt(d_neighbors, start_v, end_v, u);
+
+    //printf("Upper Index u : %d, Upper Index v : %d , end u : %d , end v : %d \n", upper_index_u, upper_index_v, end_u, end_v);
+
+    VertexID v3, v4;
+
+    for (ui i = upper_index_u; i < end_u; i++){
+        v3 = d_neighbors[i];
+        for (ui j = upper_index_v; j < end_v; j++){
+            v4 = d_neighbors[j];
+            if((v3 != v4) && check_directed_edge_existence_gpu(d_offsets, d_neighbors, v3, v4)){
+                count += 1;
+            }
+        }
+    }
+
+    //printf("Count : %d\n", count);
+    atomicAdd(d_square_count, count); 
+}
+
+
 
 // Thread Per Vertex
 __global__ void triangle_counting_kernel (const ui* d_vertices_count, const ui* d_edges_count, const ui* d_main_degrees, const ui* d_degrees, const ui* d_offsets, const VertexID* d_neighbors, ui* d_triangle_counts)
@@ -879,6 +1016,64 @@ long long CountingAlgorithm::db_count_square_parallel(Graph* main_graph, Graph* 
 }
 
 
+// Thread Per Vertex (Atomic) - Square
+long long CountingAlgorithm::db_count_square_parallel_atomic(Graph* main_graph, Graph* augmented_graph){
+
+
+    ui* d_main_degrees = nullptr, *d_main_offsets = nullptr, *d_offsets = nullptr, *d_main_neighbors = nullptr, *d_neighbors = nullptr;
+    unsigned long long* d_square_count = nullptr;
+    ui* d_vertices_count = nullptr, *d_edges_count = nullptr;
+    unsigned long long square_count = 0;
+    
+
+    cudaMalloc((void**)&d_vertices_count, sizeof(ui));
+    cudaMalloc((void**)&d_edges_count, sizeof(ui));    
+    cudaMalloc((void**)&d_main_degrees, (augmented_graph->vertices_count * sizeof(ui)));
+    cudaMalloc((void**)&d_main_offsets, ((augmented_graph->vertices_count + 1)  * sizeof(ui)));
+    cudaMalloc((void**)&d_offsets, ((augmented_graph->vertices_count + 1) * sizeof(ui)));
+    cudaMalloc((void**)&d_main_neighbors, ((augmented_graph->edges_count) * 2 * sizeof(VertexID)));
+    cudaMalloc((void**)&d_neighbors, ((augmented_graph->edges_count) * sizeof(VertexID)));
+    cudaMalloc((void**)&d_square_count, sizeof(unsigned long long));
+
+    cudaMemset(d_square_count, 0, sizeof(unsigned long long));
+
+
+    cudaMemcpy(d_vertices_count, &(augmented_graph->vertices_count), sizeof(ui), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_edges_count, &(augmented_graph->edges_count), sizeof(ui), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_main_degrees, augmented_graph->main_degrees, ((augmented_graph->vertices_count) * sizeof(ui)), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_main_offsets, main_graph->offsets, ((augmented_graph->vertices_count + 1) * sizeof(ui)), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_offsets, augmented_graph->offsets, ((augmented_graph->vertices_count + 1) * sizeof(ui)), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_main_neighbors, main_graph->neighbors, ((augmented_graph->edges_count) * 2 * sizeof(VertexID)), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_neighbors, augmented_graph->neighbors, ((augmented_graph->edges_count) * sizeof(VertexID)), cudaMemcpyHostToDevice);
+
+
+    int num_blocks = (augmented_graph->vertices_count + threads_per_block - 1) / threads_per_block;
+
+    square_counting_kernel_atomic<<<num_blocks, threads_per_block>>>(
+        d_vertices_count,
+        d_edges_count,
+        d_main_degrees,
+        d_main_offsets,
+        d_main_neighbors,
+        d_offsets,
+        d_neighbors,
+        d_square_count
+    );
+    
+    cudaDeviceSynchronize();
+    cudaMemcpy(square_count, d_square_count, sizeof(unsigned long long), cudaMemcpyDeviceToHost);
+
+    cudaFree(d_main_degrees);
+    cudaFree(d_main_offsets);
+    cudaFree(d_offsets);
+    cudaFree(d_main_neighbors);
+    cudaFree(d_neighbors);
+
+    return square_count;
+}
+
+
+
 // Thread Per Edge - Square
 long long CountingAlgorithm::db_count_square_ei_parallel(Graph* graph, VertexID* edge_src_vertices){
 
@@ -933,4 +1128,53 @@ long long CountingAlgorithm::db_count_square_ei_parallel(Graph* graph, VertexID*
     cudaFree(d_square_counts); 
 
     return exact_count;
+}
+
+
+// Thread Per Edge (Atomic) - Square
+long long CountingAlgorithm::db_count_square_ei_parallel_atomic(Graph* graph, VertexID* edge_src_vertices){
+
+    ui* d_offsets = nullptr, *d_src_vertices = nullptr, *d_neighbors = nullptr;
+    unsigned long long* d_square_count = nullptr;
+    ui* d_vertices_count = nullptr, *d_edges_count = nullptr;
+    unsigned long long square_count = 0;
+    
+
+    cudaMalloc((void**)&d_vertices_count, sizeof(ui));
+    cudaMalloc((void**)&d_edges_count, sizeof(ui));    
+    cudaMalloc((void**)&d_offsets, ((graph->vertices_count + 1) * sizeof(ui)));
+    cudaMalloc((void**)&d_src_vertices, ((graph->edges_count) * 2 * sizeof(VertexID)));
+    cudaMalloc((void**)&d_neighbors, ((graph->edges_count) * 2 * sizeof(VertexID)));
+    cudaMalloc((void**)&d_square_count, (sizeof(unsigned long long)));
+
+    cudaMemset(d_square_count, 0, sizeof(unsigned long long));
+
+    cudaMemcpy(d_vertices_count, &(graph->vertices_count), sizeof(ui), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_edges_count, &(graph->edges_count), sizeof(ui), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_offsets, graph->offsets, ((graph->vertices_count + 1) * sizeof(ui)), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_src_vertices, edge_src_vertices, ((graph->edges_count) * 2 * sizeof(VertexID)), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_neighbors, graph->neighbors, ((graph->edges_count) * 2 * sizeof(VertexID)), cudaMemcpyHostToDevice);
+    
+
+
+    //int threads_per_block = 256;
+    int num_blocks = (((graph->edges_count) * 2) + threads_per_block - 1) / threads_per_block;
+    
+    square_counting_ei_kernel_atomic<<<num_blocks, threads_per_block>>>(
+        d_vertices_count,
+        d_edges_count,
+        d_offsets,
+        d_src_vertices,
+        d_neighbors,
+        d_square_count
+    );
+    
+    cudaDeviceSynchronize();
+    cudaMemcpy(square_count, d_square_count, sizeof(unsigned long long), cudaMemcpyDeviceToHost);
+
+    cudaFree(d_offsets);
+    cudaFree(d_src_vertices);
+    cudaFree(d_neighbors); 
+
+    return square_count;
 }
