@@ -1061,7 +1061,7 @@ long long CountingAlgorithm::db_count_square_parallel_atomic(Graph* main_graph, 
     );
     
     cudaDeviceSynchronize();
-    cudaMemcpy(square_count, d_square_count, sizeof(unsigned long long), cudaMemcpyDeviceToHost);
+    cudaMemcpy(&square_count, d_square_count, sizeof(unsigned long long), cudaMemcpyDeviceToHost);
 
     cudaFree(d_main_degrees);
     cudaFree(d_main_offsets);
@@ -1170,7 +1170,7 @@ long long CountingAlgorithm::db_count_square_ei_parallel_atomic(Graph* graph, Ve
     );
     
     cudaDeviceSynchronize();
-    cudaMemcpy(square_count, d_square_count, sizeof(unsigned long long), cudaMemcpyDeviceToHost);
+    cudaMemcpy(&square_count, d_square_count, sizeof(unsigned long long), cudaMemcpyDeviceToHost);
 
     cudaFree(d_offsets);
     cudaFree(d_src_vertices);
